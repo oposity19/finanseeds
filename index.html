@@ -1,0 +1,983 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="FinanSeeds: aprende finanzas con lecciones cortas y gana semillas por aprender.">
+<title>FinanSeeds</title>
+<style>
+  :root {
+    /* Layout: una tarjeta centrada tipo app; ruta vertical de lecciones; barra de comprobar abajo */
+    --page: #fbfbf7; --card: #f3f2ea; --surface: #f6f5ef; --raised: #ffffff; --green: #2d5a3d; --green-2: #3f7a52; --green-soft: #e2efe3; --on-accent: #ffffff; --btn-shadow: #2c5a3b; --text: #1f2a22; --muted: #6b6f68; --why: #3d4a40; --border: #d9d9cf; --hover: #9cc1a3; --track: #e3e2d8; --rule: #eceae2; --press: #e7e6dc; --disabled: #cfcfc5; --disabled-shadow: #b8b8ae; --secondary-shadow: #d6d5cb; --ok: #2f8a4a; --ok-soft: #e1f2e4; --ok-line: #b9dcc1; --bad: #c2513c; --bad-soft: #f9e5e0; --bad-line: #eec1b6; --bad-btn: #c2513c; --bad-shadow: #92392a; --gold: #b5862a; --gold-soft: #f6ecd4; --gold-line: #e7d3a4; --gold-text: #6d5014; --shadow: rgba(0,0,0,.05); --scrim: rgba(20,28,22,.45);
+    --radius: 16px;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --page: #111512; --card: #1a201b; --surface: #212822; --raised: #273028; --green: #93c9a0; --green-2: #4c9160; --green-soft: #22372a; --on-accent: #ffffff; --btn-shadow: #2a5236; --text: #e6ebe5; --muted: #9ba49b; --why: #c3cbc2; --border: #364036; --hover: #5f8f6a; --track: #2c352d; --rule: #313a32; --press: #2a322b; --disabled: #3a423a; --disabled-shadow: #262c26; --secondary-shadow: #262c26; --ok: #72c889; --ok-soft: #1e3525; --ok-line: #2f5a3a; --bad: #e8866f; --bad-soft: #3a2320; --bad-line: #6a3a30; --bad-btn: #b44e3a; --bad-shadow: #6e2d20; --gold: #d8aa4b; --gold-soft: #382e1d; --gold-line: #5c4a26; --gold-text: #ebcd85; --shadow: rgba(0,0,0,.4); --scrim: rgba(0,0,0,.6); color-scheme: dark; } }
+  :root[data-theme="dark"] { --page: #111512; --card: #1a201b; --surface: #212822; --raised: #273028; --green: #93c9a0; --green-2: #4c9160; --green-soft: #22372a; --on-accent: #ffffff; --btn-shadow: #2a5236; --text: #e6ebe5; --muted: #9ba49b; --why: #c3cbc2; --border: #364036; --hover: #5f8f6a; --track: #2c352d; --rule: #313a32; --press: #2a322b; --disabled: #3a423a; --disabled-shadow: #262c26; --secondary-shadow: #262c26; --ok: #72c889; --ok-soft: #1e3525; --ok-line: #2f5a3a; --bad: #e8866f; --bad-soft: #3a2320; --bad-line: #6a3a30; --bad-btn: #b44e3a; --bad-shadow: #6e2d20; --gold: #d8aa4b; --gold-soft: #382e1d; --gold-line: #5c4a26; --gold-text: #ebcd85; --shadow: rgba(0,0,0,.4); --scrim: rgba(0,0,0,.6); color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--page);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.45;
+    min-height: 100vh;
+    padding-block: 24px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  button { font: inherit; color: inherit; }
+  button:focus-visible { outline: 2px solid var(--green-2); outline-offset: 2px; }
+
+  .shell {
+    max-width: 960px;
+    margin: 0 auto;
+    background: var(--card);
+    border-radius: 22px;
+    padding: 28px 24px;
+    box-shadow: 0 1px 3px var(--shadow);
+  }
+
+  /* ---------- Bienvenida ---------- */
+  .brand { display: flex; gap: 12px; align-items: flex-start; }
+  .brand svg { flex: none; margin-top: 5px; color: var(--green); }
+  .brand h1 { margin: 0; font-size: 25px; color: var(--green); font-weight: 650; line-height: 1.2; }
+  .brand p { margin: 2px 0 0; color: var(--muted); }
+  .brand.small h1 { font-size: 20px; }
+  .brand.small p { display: none; }
+  .brand.small svg { margin-top: 2px; }
+
+  .question-title { color: var(--green); font-size: 19px; font-weight: 600; margin: 26px 0 16px; }
+
+  .choice {
+    display: block; width: 100%; text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 16px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .choice:hover, .choice:focus-visible { border-color: var(--hover); background: var(--raised); transform: translateY(-1px); outline: none; }
+  .choice strong { display: block; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+  .choice span { color: var(--muted); }
+  .tagline { text-align: center; color: var(--green-2); margin: 6px 0 0; }
+
+  /* ---------- Inicio ---------- */
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .stats { display: flex; gap: 8px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--raised); border: 1px solid var(--border);
+    border-radius: 999px; padding: 5px 12px; font-size: 15px; white-space: nowrap;
+  }
+  .pill.seeds { background: var(--gold-soft); border-color: var(--gold-line); color: var(--gold-text); }
+  .pill.seeds b { font-weight: 700; }
+
+  .tabs { display: flex; gap: 8px; margin: 22px 0 18px; flex-wrap: wrap; }
+  .tab {
+    background: transparent; border: 1px solid var(--border); border-radius: 999px;
+    padding: 7px 14px; cursor: pointer; color: var(--muted);
+  }
+  .tab.active { background: var(--green-2); border-color: var(--green-2); color: var(--on-accent); }
+
+  .level-head h2 { margin: 0; color: var(--green); font-size: 21px; }
+  .level-head p { margin: 4px 0 12px; color: var(--muted); }
+  .meter { height: 10px; background: var(--track); border-radius: 999px; overflow: hidden; }
+  .meter > div { height: 100%; background: var(--green-2); border-radius: 999px; transition: width .35s; }
+  .level-head small { display: block; margin-top: 6px; color: var(--muted); }
+
+  .path { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; }
+  .node {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .node:hover:not(:disabled) { border-color: var(--hover); background: var(--raised); }
+  .node:disabled { cursor: not-allowed; opacity: .55; }
+  .node .icon {
+    flex: none; width: 46px; height: 46px; border-radius: 50%;
+    display: grid; place-items: center; font-size: 22px;
+    background: var(--raised); border: 2px solid var(--border);
+  }
+  .node.done .icon { border-color: var(--green-2); background: var(--green-soft); }
+  .node.next .icon { border-color: var(--gold); }
+  .node .info { flex: 1; min-width: 0; }
+  .node .info strong { display: block; font-size: 16.5px; }
+  .node .info span { color: var(--muted); font-size: 14px; }
+  .node .status { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .node.done .status { color: var(--green-2); font-weight: 600; }
+  .node.next .status { color: var(--gold); font-weight: 600; }
+  .node.challenge { border-style: dashed; }
+  .node.challenge .icon { background: var(--gold-soft); }
+
+  .rewards {
+    margin-top: 22px; background: var(--raised); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 4px 16px;
+  }
+  .rewards summary { cursor: pointer; padding: 12px 0; font-weight: 600; color: var(--green); }
+  .rewards p { margin: 0 0 10px; color: var(--muted); font-size: 14.5px; }
+  .rewards table { width: 100%; border-collapse: collapse; margin-bottom: 14px; font-size: 14.5px; }
+  .rewards td { padding: 7px 0; border-top: 1px solid var(--rule); }
+  .rewards td:last-child { text-align: right; font-weight: 600; color: var(--gold-text); white-space: nowrap; padding-left: 12px; }
+
+  .link { background: none; border: none; color: var(--green-2); cursor: pointer; text-decoration: underline; padding: 4px; }
+
+  /* ---------- Lección ---------- */
+  .session-bar { display: flex; align-items: center; gap: 14px; }
+  .session-bar .meter { flex: 1; height: 14px; }
+  .icon-btn {
+    background: none; border: none; font-size: 22px; line-height: 1; color: var(--muted);
+    cursor: pointer; padding: 4px 6px; border-radius: 8px;
+  }
+  .icon-btn:hover { background: var(--press); }
+
+  .timer { height: 6px; background: var(--track); border-radius: 999px; overflow: hidden; margin-top: 12px; }
+  .timer > div { height: 100%; background: var(--gold); transition: width .1s linear; }
+  .timer > div.low { background: var(--bad); }
+
+  .eyebrow { margin: 26px 0 4px; color: var(--muted); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .q { margin: 0 0 20px; font-size: 22px; line-height: 1.3; }
+
+  .options { display: grid; gap: 12px; }
+  .option {
+    display: flex; align-items: center; gap: 12px; text-align: left; width: 100%;
+    background: var(--raised); border: 2px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; cursor: pointer; font-size: 16.5px;
+    transition: border-color .12s, background .12s;
+  }
+  .option kbd {
+    flex: none; display: grid; place-items: center; width: 26px; height: 26px;
+    border: 1px solid var(--border); border-radius: 7px; font: inherit; font-size: 13px; color: var(--muted);
+  }
+  .option:hover:not(:disabled) { border-color: var(--hover); }
+  .option.selected { border-color: var(--green-2); background: var(--green-soft); }
+  .option.right { border-color: var(--ok); background: var(--ok-soft); }
+  .option.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  .option:disabled { cursor: default; }
+
+  .checkbar {
+    position: sticky; bottom: 0; margin: 26px -24px -28px; padding: 18px 24px;
+    border-top: 1px solid var(--border); background: var(--card);
+    border-radius: 0 0 22px 22px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .checkbar.ok { background: var(--ok-soft); border-color: var(--ok-line); }
+  .checkbar.bad { background: var(--bad-soft); border-color: var(--bad-line); }
+  .feedback { flex: 1; min-width: 220px; }
+  .feedback strong { display: block; font-size: 18px; }
+  .checkbar.ok .feedback strong { color: var(--ok); }
+  .checkbar.bad .feedback strong { color: var(--bad); }
+  .feedback p { margin: 4px 0 0; font-size: 15px; }
+  .feedback .why { color: var(--why); }
+  .btn {
+    margin-left: auto; min-width: 160px; border: none; border-radius: 14px; padding: 13px 22px;
+    background: var(--green-2); color: var(--on-accent); font-weight: 700; font-size: 16px; cursor: pointer;
+    box-shadow: 0 3px 0 var(--btn-shadow);
+  }
+  .btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--btn-shadow); }
+  .btn:disabled { background: var(--disabled); box-shadow: 0 3px 0 var(--disabled-shadow); cursor: not-allowed; }
+  .checkbar.bad .btn { background: var(--bad-btn); box-shadow: 0 3px 0 var(--bad-shadow); }
+  .btn.secondary { background: var(--raised); color: var(--green); border: 1px solid var(--border); box-shadow: 0 3px 0 var(--secondary-shadow); }
+
+  .learn-card, .result-card { text-align: center; padding: 18px 0 6px; }
+  .big-emoji { font-size: 54px; line-height: 1; }
+  .learn-card h2, .result-card h2 { margin: 12px 0 4px; color: var(--green); font-size: 24px; }
+  .learn-card .sub, .result-card .sub { color: var(--muted); margin: 0 0 20px; }
+  .learn-list {
+    text-align: left; max-width: 620px; margin: 0 auto; padding: 0; list-style: none; display: grid; gap: 10px;
+  }
+  .learn-list li {
+    background: var(--raised); border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px 12px 44px; position: relative;
+  }
+  .learn-list li::before { content: "💡"; position: absolute; left: 14px; top: 11px; }
+
+  .breakdown { max-width: 420px; margin: 0 auto; text-align: left; background: var(--raised); border: 1px solid var(--border); border-radius: 14px; padding: 6px 16px; }
+  .breakdown div { display: flex; justify-content: space-between; padding: 8px 0; border-top: 1px solid var(--rule); }
+  .breakdown div:first-child { border-top: none; }
+  .breakdown div span:last-child { font-weight: 600; color: var(--gold-text); }
+  .breakdown .total { font-weight: 700; }
+  .breakdown .total span:last-child { font-size: 18px; }
+  .result-stats { display: flex; justify-content: center; gap: 10px; margin: 0 0 18px; flex-wrap: wrap; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 20px);
+    background: var(--green-2); color: var(--on-accent); padding: 11px 18px; border-radius: 12px;
+    font-size: 15px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
+    max-width: calc(100% - 32px); text-align: center; z-index: 10;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  .float-gain {
+    position: fixed; z-index: 11; font-weight: 800; font-size: 22px; color: var(--gold);
+    pointer-events: none; animation: rise 1s ease-out forwards;
+  }
+  @keyframes rise { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-60px); } }
+
+  @media (max-width: 560px) {
+    body { padding-block: 12px; }
+    .shell { padding: 22px 16px; }
+    .checkbar { margin: 22px -16px -22px; padding: 16px; }
+    .btn { width: 100%; margin-left: 0; }
+    .q { font-size: 19px; }
+    .node .status { display: none; }
+  }
+
+  /* Confirmación para salir, dentro de la página */
+  .scrim { position: fixed; inset: 0; background: var(--scrim); display: grid; place-items: center; padding: 16px; z-index: 20; }
+  .dialog { background: var(--card); border: 1px solid var(--border); border-radius: 18px; padding: 22px; max-width: 380px; width: 100%; text-align: center; }
+  .dialog h3 { margin: 0 0 6px; color: var(--green); font-size: 19px; }
+  .dialog p { margin: 0 0 18px; color: var(--muted); }
+  .dialog .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .dialog .btn { flex: 1; margin: 0; min-width: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* =========================================================
+   CONTENIDO — niveles, lecciones y preguntas
+   answer = índice de la opción correcta (empieza en 0)
+   ========================================================= */
+const LEVELS = [
+  {
+    key: 'basico', name: 'Básico', emoji: '🌱',
+    title: 'Quiero saber lo básico',
+    desc: 'Aprender a ahorrar, organizar mi dinero y tomar mejores decisiones.',
+    lessons: [
+      {
+        id: 'b1', emoji: '💰', title: '¿Qué es ahorrar?', summary: 'Págate a ti primero',
+        learn: [
+          'Ahorrar es guardar una parte de tu dinero hoy para usarla después.',
+          'La clave: aparta primero y gasta después — no al revés.',
+          'Un fondo de emergencia cubre imprevistos (idealmente 3 a 6 meses de gastos).'
+        ],
+        questions: [
+          { q: '¿Cuál es la mejor forma de empezar a ahorrar?',
+            options: ['Ahorrar lo que sobre a fin de mes', 'Apartar una parte apenas recibes dinero', 'Esperar a ganar más', 'Pedir prestado para ahorrar'],
+            answer: 1, why: 'Si apartas primero, el ahorro no depende de que "sobre" algo. A esto se le llama "págate a ti primero".' },
+          { q: '¿Para qué sirve un fondo de emergencia?',
+            options: ['Para comprar en ofertas', 'Para cubrir imprevistos sin endeudarte', 'Para invertir en la bolsa', 'Para pagar vacaciones'],
+            answer: 1, why: 'Es tu colchón: si se descompone algo o pierdes un ingreso, no necesitas pedir prestado.' },
+          { q: 'Si ahorras $50 cada semana, ¿cuánto tendrás en 10 semanas?',
+            options: ['$100', '$250', '$500', '$1,000'],
+            answer: 2, why: '$50 × 10 semanas = $500. Cantidades pequeñas y constantes suman.' },
+          { q: 'Verdadero o falso: solo las personas con mucho dinero pueden ahorrar.',
+            options: ['Verdadero', 'Falso'],
+            answer: 1, why: 'Ahorrar es un hábito, no un monto. Hasta un 5% de lo que recibes cuenta.' }
+        ]
+      },
+      {
+        id: 'b2', emoji: '🛒', title: 'Necesidades vs. deseos', summary: '¿Lo necesito o lo quiero?',
+        learn: [
+          'Necesidad: algo que necesitas para vivir o estudiar (comida, transporte, renta).',
+          'Deseo: algo que te gusta pero puedes vivir sin él (ropa de marca, otra suscripción).',
+          'Antes de comprar, pregúntate: ¿lo necesito o lo quiero?'
+        ],
+        questions: [
+          { q: '¿Cuál de estos es una necesidad?',
+            options: ['Unos tenis de edición limitada', 'El transporte para ir a la escuela', 'Una suscripción de videojuegos', 'Un café de especialidad diario'],
+            answer: 1, why: 'Sin transporte no llegas a la escuela. Los demás son gustos válidos, pero opcionales.' },
+          { q: '¿Cuál de estos es un deseo?',
+            options: ['Comida', 'Medicinas', 'Un celular nuevo cuando el tuyo funciona bien', 'Pagar la luz'],
+            answer: 2, why: 'Si tu celular funciona, cambiarlo es un deseo. No está mal, solo hay que planearlo.' },
+          { q: 'Ves algo que quieres pero no estaba en tu plan. ¿Qué conviene hacer?',
+            options: ['Comprarlo ya, antes de que se acabe', 'Esperar 24-48 horas y decidir después', 'Pedir prestado', 'Comprarlo a meses sin pensarlo'],
+            answer: 1, why: 'Esperar un poco ayuda a separar un impulso de algo que de verdad quieres.' },
+          { q: 'Los "gastos hormiga" son…',
+            options: ['Gastos grandes y poco frecuentes', 'Gastos pequeños y frecuentes que suman mucho', 'Gastos de comida para mascotas', 'Impuestos'],
+            answer: 1, why: 'Un snack de $25 diario son unos $750 al mes. Pequeño cada vez, grande en total.' }
+        ]
+      },
+      {
+        id: 'b3', emoji: '🎯', title: 'Metas de ahorro', summary: 'Qué, cuánto y para cuándo',
+        learn: [
+          'Una meta clara tiene: qué quieres, cuánto cuesta y para cuándo.',
+          'Divide el costo entre el tiempo para saber cuánto apartar cada semana o mes.',
+          'Ver tu progreso te motiva a seguir.'
+        ],
+        questions: [
+          { q: '¿Cuál es la meta mejor definida?',
+            options: ['Quiero ahorrar', 'Quiero ahorrar mucho dinero', 'Quiero ahorrar $3,000 para una bici en 6 meses', 'Algún día compraré algo'],
+            answer: 2, why: 'Tiene monto y plazo: así sabes exactamente cuánto apartar.' },
+          { q: 'Quieres juntar $1,200 en 4 meses. ¿Cuánto debes ahorrar al mes?',
+            options: ['$200', '$300', '$400', '$1,200'],
+            answer: 1, why: '$1,200 ÷ 4 meses = $300 al mes.' },
+          { q: 'Si un mes no logras ahorrar lo planeado, lo mejor es…',
+            options: ['Abandonar la meta', 'Ajustar el plazo o el monto y seguir', 'Endeudarte para alcanzarla', 'Gastar todo lo ahorrado'],
+            answer: 1, why: 'Las metas se ajustan. Lo importante es mantener el hábito.' },
+          { q: '¿Dónde conviene guardar el dinero de una meta?',
+            options: ['En la cartera, para tenerlo a la mano', 'Separado, en una cuenta o apartado distinto', 'Prestado a amigos', 'En la misma cuenta de tus gastos diarios'],
+            answer: 1, why: 'Separarlo evita que lo gastes sin darte cuenta.' }
+        ]
+      }
+    ]
+  },
+  {
+    key: 'intermedio', name: 'Intermedio', emoji: '🌿',
+    title: 'Quiero aprender más',
+    desc: 'Conocer sobre presupuestos, bancos, tarjetas de crédito e intereses.',
+    lessons: [
+      {
+        id: 'i1', emoji: '📊', title: 'Tu primer presupuesto', summary: 'La regla 50/30/20',
+        learn: [
+          'Un presupuesto es un plan de a dónde va tu dinero antes de gastarlo.',
+          'Regla 50/30/20: 50% necesidades, 30% deseos, 20% ahorro o pago de deudas.',
+          'Registrar tus gastos durante un mes te muestra la realidad.'
+        ],
+        questions: [
+          { q: 'Con la regla 50/30/20 y un ingreso de $10,000, ¿cuánto va a ahorro?',
+            options: ['$500', '$2,000', '$3,000', '$5,000'],
+            answer: 1, why: '20% de $10,000 = $2,000.' },
+          { q: 'En esa misma regla, ¿qué porcentaje es para necesidades?',
+            options: ['20%', '30%', '50%', '70%'],
+            answer: 2, why: 'La mitad del ingreso cubre lo esencial: vivienda, comida, transporte.' },
+          { q: 'Presupuestaste $1,000 para salidas y ya gastaste $1,200. ¿Qué haces?',
+            options: ['Nada, el presupuesto es solo una idea', 'Recortar otra categoría de deseos para compensar', 'Usar el ahorro sin pensarlo', 'Dejar de registrar gastos'],
+            answer: 1, why: 'El presupuesto es flexible: si te pasas en un deseo, compensas con otro deseo, no con tu ahorro.' },
+          { q: '¿Cuál es el primer paso para hacer un presupuesto?',
+            options: ['Sacar una tarjeta de crédito', 'Saber cuánto ingresas y en qué gastas', 'Invertir en bolsa', 'Pedir un préstamo'],
+            answer: 1, why: 'Sin conocer tus números reales, cualquier plan es adivinanza.' }
+        ]
+      },
+      {
+        id: 'i2', emoji: '🏦', title: 'Bancos y cuentas', summary: 'Débito, comisiones y seguridad',
+        learn: [
+          'Una tarjeta de débito usa tu propio dinero; una de crédito usa dinero prestado por el banco.',
+          'Las cuentas pueden cobrar comisiones: lee las condiciones antes de abrir una.',
+          'Algunas cuentas te pagan rendimiento por el dinero que guardas.'
+        ],
+        questions: [
+          { q: 'Al pagar con tarjeta de débito, usas…',
+            options: ['Dinero prestado por el banco', 'Tu propio dinero de la cuenta', 'Dinero del gobierno', 'Puntos de recompensa'],
+            answer: 1, why: 'El débito descuenta directo de tu saldo. Si no hay saldo, no pasa el pago.' },
+          { q: '¿Qué es una comisión bancaria?',
+            options: ['Un regalo del banco', 'Un cobro por usar ciertos servicios', 'Un tipo de inversión', 'El interés que te paga el banco'],
+            answer: 1, why: 'Por ejemplo: por manejo de cuenta, por retirar en otro cajero o por no tener el saldo mínimo.' },
+          { q: '¿Qué conviene revisar antes de abrir una cuenta?',
+            options: ['Solo el diseño de la tarjeta', 'Comisiones, saldo mínimo y rendimiento', 'Cuántas sucursales tiene en otro país', 'Nada, todas son iguales'],
+            answer: 1, why: 'Dos cuentas pueden parecer iguales y costarte muy distinto al año.' },
+          { q: 'Verdadero o falso: nunca debes compartir tu NIP, ni con alguien que dice llamar del banco.',
+            options: ['Verdadero', 'Falso'],
+            answer: 0, why: 'El banco nunca te pedirá tu NIP. Quien lo pide casi siempre es un fraude.' }
+        ]
+      },
+      {
+        id: 'i3', emoji: '💳', title: 'Tarjetas de crédito e intereses', summary: 'Pagar total vs. pago mínimo',
+        learn: [
+          'El crédito es dinero prestado: todo lo que gastas lo debes devolver.',
+          'Si pagas el total antes de la fecha límite, normalmente no pagas intereses.',
+          'Si solo pagas el mínimo, el resto genera intereses y la deuda crece.'
+        ],
+        questions: [
+          { q: '¿Cuál es la mejor forma de usar una tarjeta de crédito?',
+            options: ['Pagar solo el mínimo', 'Pagar el total antes de la fecha límite', 'No pagar hasta que llamen', 'Usarla para todo sin revisar'],
+            answer: 1, why: 'Pagando el total, el crédito no te cuesta intereses y construyes un buen historial.' },
+          { q: 'Debes $1,000 con interés del 5% mensual y no pagas nada. ¿Cuánto debes el mes siguiente?',
+            options: ['$1,000', '$1,005', '$1,050', '$1,500'],
+            answer: 2, why: '$1,000 × 5% = $50 de interés → $1,050. Y el siguiente mes el interés se cobra sobre $1,050.' },
+          { q: '¿Qué pasa si solo pagas el mínimo cada mes?',
+            options: ['La deuda desaparece rápido', 'Pagas mucho más en intereses y tardas años', 'El banco te perdona el resto', 'Nada'],
+            answer: 1, why: 'El mínimo apenas cubre intereses; lo que debes baja muy lento.' },
+          { q: 'Tener un buen historial de crédito sirve para…',
+            options: ['Nada', 'Conseguir préstamos con mejores condiciones en el futuro', 'Que te cobren más', 'No pagar impuestos'],
+            answer: 1, why: 'Pagar a tiempo demuestra que eres confiable: créditos futuros (auto, casa) salen más baratos.' }
+        ]
+      }
+    ]
+  },
+  {
+    key: 'avanzado', name: 'Avanzado', emoji: '🌳',
+    title: 'Quiero conocer a fondo las finanzas',
+    desc: 'Explorar inversiones, bolsa de valores y cómo hacer crecer mi dinero.',
+    lessons: [
+      {
+        id: 'a1', emoji: '📈', title: 'Interés compuesto e inflación', summary: 'Haz que el tiempo trabaje para ti',
+        learn: [
+          'Interés compuesto: ganas intereses sobre tus intereses. El tiempo es su mejor aliado.',
+          'La inflación es el aumento general de precios: con el mismo dinero compras menos.',
+          'Si tu dinero rinde menos que la inflación, pierdes poder de compra.'
+        ],
+        questions: [
+          { q: 'Inviertes $1,000 al 10% anual compuesto. ¿Cuánto tienes después de 2 años?',
+            options: ['$1,100', '$1,200', '$1,210', '$1,020'],
+            answer: 2, why: 'Año 1: $1,100. Año 2: $1,100 × 1.10 = $1,210. Esos $10 extra son interés sobre interés.' },
+          { q: 'Si la inflación es 5% y tu cuenta paga 2%, tu dinero…',
+            options: ['Gana poder de compra', 'Pierde poder de compra', 'Se mantiene igual', 'Se duplica'],
+            answer: 1, why: 'Rindes 2% pero los precios suben 5%: en términos reales pierdes cerca de 3% al año.' },
+          { q: '¿Qué favorece más al interés compuesto?',
+            options: ['Empezar tarde con mucho dinero', 'Empezar temprano y dejarlo crecer', 'Retirar los intereses cada mes', 'Cambiar de inversión cada semana'],
+            answer: 1, why: 'Cada año extra compone sobre una base más grande. El tiempo pesa más que el monto inicial.' },
+          { q: 'La "regla del 72" estima en cuántos años se duplica tu dinero. Al 8% anual son aprox…',
+            options: ['4 años', '9 años', '18 años', '72 años'],
+            answer: 1, why: '72 ÷ 8 = 9 años.' }
+        ]
+      },
+      {
+        id: 'a2', emoji: '🏛️', title: 'La bolsa de valores', summary: 'Acciones, ETFs y diversificación',
+        learn: [
+          'Una acción es una pequeña parte de una empresa.',
+          'Un ETF o fondo agrupa muchas acciones en un solo instrumento.',
+          'Diversificar = no poner todos los huevos en la misma canasta.'
+        ],
+        questions: [
+          { q: 'Al comprar una acción, te vuelves…',
+            options: ['Empleado de la empresa', 'Dueño de una pequeña parte de la empresa', 'Acreedor del gobierno', 'Cliente preferente'],
+            answer: 1, why: 'Eres socio: si a la empresa le va bien, tu parte vale más; si le va mal, vale menos.' },
+          { q: '¿Qué es diversificar?',
+            options: ['Invertir todo en una sola empresa', 'Repartir tu dinero en distintas inversiones', 'Vender todo cuando baja', 'Invertir solo en lo que está de moda'],
+            answer: 1, why: 'Si una inversión cae, las otras pueden compensar.' },
+          { q: 'Un ETF que replica un índice como el S&P 500…',
+            options: ['Es una sola acción', 'Te da exposición a muchas empresas a la vez', 'Garantiza ganancias', 'Es un tipo de tarjeta'],
+            answer: 1, why: 'Con un solo instrumento tienes un pedacito de cientos de empresas.' },
+          { q: 'Verdadero o falso: las inversiones en bolsa tienen ganancias garantizadas.',
+            options: ['Verdadero', 'Falso'],
+            answer: 1, why: 'Nada en bolsa está garantizado. Si alguien te promete ganancias seguras, desconfía.' }
+        ]
+      },
+      {
+        id: 'a3', emoji: '🧭', title: 'Riesgo, rendimiento y plazo', summary: 'Invierte según tu horizonte',
+        learn: [
+          'A mayor rendimiento esperado, normalmente mayor riesgo.',
+          'Tu horizonte es cuánto tiempo puedes dejar el dinero invertido.',
+          'El dinero que necesitas pronto no debería estar en inversiones que suben y bajan mucho.'
+        ],
+        questions: [
+          { q: '¿Qué relación suelen tener riesgo y rendimiento?',
+            options: ['Más rendimiento, menos riesgo', 'Más rendimiento esperado, más riesgo', 'No tienen relación', 'Siempre son iguales'],
+            answer: 1, why: 'Para aspirar a ganar más, aceptas más variación. No existe alto rendimiento sin riesgo.' },
+          { q: 'Necesitas tu dinero en 3 meses para la colegiatura. ¿Dónde conviene tenerlo?',
+            options: ['Acciones de una sola empresa', 'Criptomonedas', 'Un instrumento de bajo riesgo y fácil acceso', 'El negocio de un amigo'],
+            answer: 2, why: 'Con un plazo corto no puedes esperar a que se recupere una caída.' },
+          { q: 'Alguien te promete 20% mensual "sin riesgo". Lo más probable es que sea…',
+            options: ['Una gran oportunidad', 'Un fraude o esquema piramidal', 'Un banco', 'Un ETF'],
+            answer: 1, why: '20% mensual compuesto es casi 800% al año. Ninguna inversión legítima garantiza eso.' },
+          { q: 'Tu inversión de largo plazo cae 10% en un mes. Lo más sensato suele ser…',
+            options: ['Vender todo en pánico', 'Revisar si cambió tu plan; si no, mantener', 'Pedir prestado para invertir más', 'Dejar de ahorrar'],
+            answer: 1, why: 'Las caídas son normales a corto plazo. Vender en pánico convierte una baja temporal en pérdida real.' }
+        ]
+      }
+    ]
+  }
+];
+
+/* =========================================================
+   SISTEMA DE SEMILLAS
+   Premia entender, no solo entrar: visitar da 1, aprender da mucho más.
+   ========================================================= */
+const REWARD = {
+  daily: 1,            // abrir la plataforma (una vez al día)
+  firstTry: 5,         // respuesta correcta al primer intento
+  secondTry: 2,        // correcta después de equivocarte (la pregunta regresa al final)
+  lessonDone: 10,      // completar una lección por primera vez
+  perfect: 10,         // lección sin errores (primera vez)
+  review: 1,           // respuesta correcta al repasar una lección ya completada
+  reviewPerfect: 3,    // repaso sin errores
+  challenge: 8,        // respuesta correcta en un reto
+  challengeReview: 2,  // respuesta correcta en un reto ya superado
+  challengeWin: 30     // superar el reto por primera vez
+};
+const CHALLENGE_SIZE = 6;
+const CHALLENGE_PASS = 5;
+const CHALLENGE_SECONDS = 20;
+
+/* ---------- Estado guardado en el navegador ---------- */
+const STORE_KEY = 'finanseeds-v1';
+function defaultState() {
+  return { level: null, seeds: 0, streak: 0, lastVisit: null, done: {}, challenges: {} };
+}
+function loadState() {
+  try { return Object.assign(defaultState(), JSON.parse(localStorage.getItem(STORE_KEY)) || {}); }
+  catch (e) { return defaultState(); }
+}
+function save() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* modo privado: sigue funcionando sin guardar */ }
+}
+
+let state = loadState();
+let session = null;
+let timerId = null;
+const app = document.getElementById('app');
+
+/* ---------- Utilidades ---------- */
+function dayKey(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function getLevel(key) { return LEVELS.find(l => l.key === key) || LEVELS[0]; }
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast.t);
+  toast.t = setTimeout(() => el.classList.remove('show'), 3200);
+}
+function floatGain(amount, anchor) {
+  const r = (anchor || app).getBoundingClientRect();
+  const el = document.createElement('div');
+  el.className = 'float-gain';
+  el.textContent = '+' + amount + ' 🌱';
+  el.style.left = (r.left + r.width / 2 - 30) + 'px';
+  el.style.top = (r.top - 10) + 'px';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+const SPROUT = `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21v-9"/><path d="M12 13C12 8.5 9 5.5 4 5.5c0 4.5 3 7.5 8 7.5z"/><path d="M12 10.5c0-3.5 2.5-6 7-6 0 3.8-2.6 6.3-7 6z"/></svg>`;
+const SEED = `<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7 6.5 5 10.5 5 14.5a7 7 0 0 0 14 0C19 10.5 17 6.5 12 2z" fill="#c99a3b"/><path d="M12 8v12" stroke="#8a6420" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+function brand(small) {
+  return `<div class="brand ${small ? 'small' : ''}">${SPROUT}<div><h1>${small ? 'FinanSeeds' : '¡Bienvenido a FinanSeeds!'}</h1><p>Pequeñas semillas, grandes decisiones.</p></div></div>`;
+}
+
+/* ---------- Visita diaria y racha ---------- */
+function dailyVisit() {
+  const today = dayKey(new Date());
+  if (state.lastVisit === today) return;
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  state.streak = state.lastVisit === dayKey(yesterday) ? state.streak + 1 : 1;
+  state.lastVisit = today;
+  state.seeds += REWARD.daily;
+  save();
+  toast(`+${REWARD.daily} semilla por visitar hoy · Las grandes se ganan aprendiendo 😉`);
+}
+
+/* =========================================================
+   PANTALLAS
+   ========================================================= */
+function render() {
+  if (session) renderSession();
+  else if (!state.level) renderWelcome();
+  else renderHome();
+}
+
+function renderWelcome() {
+  app.innerHTML = `
+    <main class="shell">
+      ${brand(false)}
+      <h2 class="question-title">¿Qué tanto te interesa aprender sobre finanzas?</h2>
+      ${LEVELS.map(l => `
+        <button class="choice" data-level="${l.key}">
+          <strong>${l.emoji} ${l.title}</strong>
+          <span>${l.desc}</span>
+        </button>`).join('')}
+      <p class="tagline">Tu aprendizaje, a tu ritmo ✨</p>
+    </main>`;
+  app.querySelectorAll('[data-level]').forEach(btn => {
+    btn.onclick = () => {
+      state.level = btn.dataset.level;
+      save();
+      dailyVisit();
+      render();
+    };
+  });
+}
+
+function renderHome() {
+  const lv = getLevel(state.level);
+  const doneCount = lv.lessons.filter(l => state.done[l.id]).length;
+  const pct = Math.round(doneCount / lv.lessons.length * 100);
+  const nextIdx = lv.lessons.findIndex(l => !state.done[l.id]);
+
+  const lessonNodes = lv.lessons.map((l, i) => {
+    const done = !!state.done[l.id];
+    const unlocked = i === 0 || !!state.done[lv.lessons[i - 1].id];
+    const isNext = i === nextIdx;
+    const maxSeeds = l.questions.length * REWARD.firstTry + REWARD.lessonDone + REWARD.perfect;
+    let status = '🔒 Bloqueada';
+    if (done) status = state.done[l.id].perfect ? '✓ Perfecta · repasar' : '✓ Completada · repasar';
+    else if (isNext) status = `Hasta +${maxSeeds} 🌱`;
+    return `<li><button class="node ${done ? 'done' : ''} ${isNext ? 'next' : ''}" data-lesson="${l.id}" ${unlocked ? '' : 'disabled'}>
+      <span class="icon">${unlocked ? l.emoji : '🔒'}</span>
+      <span class="info"><strong>${i + 1}. ${l.title}</strong><span>${l.summary} · ${l.questions.length} preguntas</span></span>
+      <span class="status">${status}</span>
+    </button></li>`;
+  }).join('');
+
+  const challengeOpen = doneCount === lv.lessons.length;
+  const challengeWon = !!state.challenges[lv.key];
+  const challengeMax = CHALLENGE_SIZE * REWARD.challenge + REWARD.challengeWin;
+  const challengeStatus = challengeWon ? '🏆 Superado · repetir' : challengeOpen ? `Hasta +${challengeMax} 🌱` : '🔒 Completa las lecciones';
+
+  app.innerHTML = `
+    <main class="shell">
+      <header class="topbar">
+        ${brand(true)}
+        <div class="stats">
+          <span class="pill" title="Días seguidos aprendiendo">🔥 ${state.streak}</span>
+          <span class="pill seeds" title="Tus semillas">${SEED} <b>${state.seeds}</b></span>
+        </div>
+      </header>
+
+      <nav class="tabs">
+        ${LEVELS.map(l => `<button class="tab ${l.key === lv.key ? 'active' : ''}" data-tab="${l.key}">${l.emoji} ${l.name}</button>`).join('')}
+      </nav>
+
+      <section class="level-head">
+        <h2>${lv.emoji} Nivel ${lv.name}</h2>
+        <p>${lv.desc}</p>
+        <div class="meter"><div style="width:${pct}%"></div></div>
+        <small>${doneCount} de ${lv.lessons.length} lecciones completadas</small>
+      </section>
+
+      <ol class="path">
+        ${lessonNodes}
+        <li><button class="node challenge ${challengeWon ? 'done' : ''} ${challengeOpen && !challengeWon ? 'next' : ''}" id="challenge" ${challengeOpen ? '' : 'disabled'}>
+          <span class="icon">${challengeWon ? '🏆' : '⚡'}</span>
+          <span class="info"><strong>Reto del nivel ${lv.name}</strong><span>${CHALLENGE_SIZE} preguntas · ${CHALLENGE_SECONDS} s cada una · necesitas ${CHALLENGE_PASS} correctas</span></span>
+          <span class="status">${challengeStatus}</span>
+        </button></li>
+      </ol>
+
+      <details class="rewards">
+        <summary>🌱 ¿Cómo gano semillas?</summary>
+        <p>Aquí las semillas premian <b>entender</b>, no solo entrar. Por eso abrir la app vale poco y responder bien vale mucho.</p>
+        <table>
+          <tr><td>Entrar a la plataforma (1 vez al día)</td><td>+${REWARD.daily}</td></tr>
+          <tr><td>Respuesta correcta al primer intento</td><td>+${REWARD.firstTry}</td></tr>
+          <tr><td>Respuesta correcta al segundo intento</td><td>+${REWARD.secondTry}</td></tr>
+          <tr><td>Completar una lección</td><td>+${REWARD.lessonDone}</td></tr>
+          <tr><td>Lección perfecta (sin errores)</td><td>+${REWARD.perfect}</td></tr>
+          <tr><td>Respuesta correcta en un reto</td><td>+${REWARD.challenge}</td></tr>
+          <tr><td>Superar un reto</td><td>+${REWARD.challengeWin}</td></tr>
+          <tr><td>Repasar lecciones o retos ya superados</td><td>+${REWARD.review} a +${REWARD.reviewPerfect}</td></tr>
+        </table>
+        <p>Si sales a mitad de una lección, no se guardan las semillas de esa lección: hay que terminarla.</p>
+      </details>
+
+      <p class="tagline"><button class="link" id="change-level">Cambiar mi nivel</button></p>
+    </main>`;
+
+  app.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { state.level = b.dataset.tab; save(); render(); });
+  app.querySelectorAll('[data-lesson]').forEach(b => b.onclick = () => startLesson(lv, b.dataset.lesson));
+  document.getElementById('challenge').onclick = () => startChallenge(lv);
+  document.getElementById('change-level').onclick = () => { state.level = null; save(); render(); };
+}
+
+/* =========================================================
+   LECCIONES Y RETOS
+   ========================================================= */
+function startLesson(lv, lessonId) {
+  const lesson = lv.lessons.find(l => l.id === lessonId);
+  session = {
+    mode: 'lesson', level: lv.key, lesson,
+    firstTime: !state.done[lesson.id],
+    phase: 'learn',
+    queue: lesson.questions.map(q => ({ q, attempt: 1 })),
+    total: lesson.questions.length,
+    finished: 0, firstTryCorrect: 0, correct: 0, mistakes: 0, earned: 0
+  };
+  render();
+}
+
+function startChallenge(lv) {
+  const pool = lv.lessons.flatMap(l => l.questions);
+  session = {
+    mode: 'challenge', level: lv.key, levelName: lv.name,
+    firstTime: !state.challenges[lv.key],
+    phase: 'quiz',
+    queue: shuffle(pool).slice(0, CHALLENGE_SIZE).map(q => ({ q, attempt: 1 })),
+    total: CHALLENGE_SIZE,
+    finished: 0, firstTryCorrect: 0, correct: 0, mistakes: 0, earned: 0
+  };
+  nextItem();
+}
+
+function nextItem() {
+  const s = session;
+  s.item = s.queue.shift();
+  if (!s.item) { finish(); return; }
+  const n = s.item.q.options.length;
+  const idx = [...Array(n).keys()];
+  s.order = n > 2 ? shuffle(idx) : idx;   // verdadero/falso conserva su orden
+  s.selected = null;
+  s.checked = false;
+  s.result = null;
+  s.phase = 'quiz';
+  if (s.mode === 'challenge') s.deadline = Date.now() + CHALLENGE_SECONDS * 1000;
+  render();
+  if (s.mode === 'challenge') startTimer();
+}
+
+function startTimer() {
+  stopTimer();
+  const total = CHALLENGE_SECONDS * 1000;
+  timerId = setInterval(() => {
+    if (!session) return stopTimer();
+    const left = Math.max(0, session.deadline - Date.now());
+    const fill = document.getElementById('timer-fill');
+    if (fill) {
+      fill.style.width = (left / total * 100) + '%';
+      fill.classList.toggle('low', left < 5000);
+    }
+    if (left <= 0) check(true);
+  }, 100);
+}
+function stopTimer() { clearInterval(timerId); timerId = null; }
+
+function select(optionIndex) {
+  if (!session || session.checked) return;
+  session.selected = optionIndex;
+  render();
+}
+
+function check(timedOut) {
+  const s = session;
+  if (!s || s.checked || (!timedOut && s.selected === null)) return;
+  stopTimer();
+  const item = s.item;
+  const ok = !timedOut && s.selected === item.q.answer;
+  let gain = 0;
+
+  if (s.mode === 'lesson') {
+    if (ok) {
+      if (item.attempt === 1) { gain = s.firstTime ? REWARD.firstTry : REWARD.review; s.firstTryCorrect++; }
+      else gain = s.firstTime ? REWARD.secondTry : 0;
+      s.correct++;
+      s.finished++;
+    } else {
+      s.mistakes++;
+      // Al fallar por primera vez, la pregunta regresa al final para reforzar el tema
+      if (item.attempt === 1) s.queue.push({ q: item.q, attempt: 2 });
+      else s.finished++;
+    }
+  } else {
+    s.finished++;
+    if (ok) { gain = s.firstTime ? REWARD.challenge : REWARD.challengeReview; s.correct++; s.firstTryCorrect++; }
+    else s.mistakes++;
+  }
+
+  s.earned += gain;
+  s.checked = true;
+  s.result = { ok, gain, timedOut };
+  render();
+  if (gain) floatGain(gain, document.querySelector('.session-bar .pill'));
+}
+
+function finish() {
+  const s = session;
+  stopTimer();
+  const lines = [['Respuestas correctas', s.earned]];
+
+  if (s.mode === 'lesson') {
+    const perfect = s.mistakes === 0;
+    if (s.firstTime) {
+      lines.push(['Lección completada', REWARD.lessonDone]);
+      if (perfect) lines.push(['Lección perfecta (sin errores)', REWARD.perfect]);
+    } else if (perfect) {
+      lines.push(['Repaso perfecto', REWARD.reviewPerfect]);
+    }
+    const prev = state.done[s.lesson.id];
+    state.done[s.lesson.id] = { perfect: perfect || !!(prev && prev.perfect) };
+    s.perfect = perfect;
+  } else {
+    s.passed = s.correct >= CHALLENGE_PASS;
+    if (s.passed && s.firstTime) lines.push(['Reto superado', REWARD.challengeWin]);
+    if (s.passed) state.challenges[s.level] = true;
+  }
+
+  s.lines = lines;
+  s.totalGain = lines.reduce((sum, l) => sum + l[1], 0);
+  state.seeds += s.totalGain;
+  save();
+  s.phase = 'result';
+  render();
+}
+
+function quit() {
+  const s = session;
+  if (s.phase === 'quiz' && !s.confirmingQuit) {
+    s.confirmingQuit = true;
+    render();
+    return;
+  }
+  stopTimer();
+  session = null;
+  render();
+}
+
+function cancelQuit() {
+  session.confirmingQuit = false;
+  render();
+}
+
+function quitDialog(s) {
+  const where = s.mode === 'lesson' ? 'esta lección' : 'este reto';
+  const msg = s.earned
+    ? `Perderás las ${s.earned} semillas que llevas en ${where}.`
+    : `Tu avance en ${where} no se guardará.`;
+  return `<div class="scrim" role="dialog" aria-modal="true" aria-labelledby="quit-title">
+    <div class="dialog">
+      <h3 id="quit-title">¿Salir ahora?</h3>
+      <p>${msg}</p>
+      <div class="actions">
+        <button class="btn secondary" id="leave">Salir</button>
+        <button class="btn" id="stay">Seguir aprendiendo</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function primaryAction() {
+  const s = session;
+  if (!s) return;
+  if (s.phase === 'learn') nextItem();
+  else if (s.phase === 'quiz') s.checked ? nextItem() : check(false);
+  else if (s.phase === 'result') { session = null; render(); }
+}
+
+/* ---------- Pantalla de lección ---------- */
+function renderSession() {
+  const s = session;
+  const progress = Math.round(s.finished / s.total * 100);
+  const bar = `
+    <div class="session-bar">
+      <button class="icon-btn" id="quit" aria-label="Salir">✕</button>
+      <div class="meter"><div style="width:${progress}%"></div></div>
+      <span class="pill seeds" title="Semillas en esta lección">${SEED} +${s.earned}</span>
+    </div>`;
+
+  if (s.phase === 'learn') {
+    const l = s.lesson;
+    const maxSeeds = s.firstTime
+      ? l.questions.length * REWARD.firstTry + REWARD.lessonDone + REWARD.perfect
+      : l.questions.length * REWARD.review + REWARD.reviewPerfect;
+    app.innerHTML = `
+      <main class="shell">
+        ${bar}
+        <div class="learn-card">
+          <div class="big-emoji">${l.emoji}</div>
+          <h2>${l.title}</h2>
+          <p class="sub">Lee esto antes de empezar — las preguntas son sobre estas ideas.</p>
+          <ul class="learn-list">${l.learn.map(t => `<li>${t}</li>`).join('')}</ul>
+        </div>
+        <div class="checkbar">
+          <div class="feedback"><p>${s.firstTime ? 'Esta lección vale' : 'Repaso: vale'} hasta <b>+${maxSeeds} semillas</b>.</p></div>
+          <button class="btn" id="action">Empezar</button>
+        </div>
+      </main>`;
+  } else if (s.phase === 'result') {
+    app.innerHTML = renderResult(s);
+  } else {
+    const item = s.item, q = item.q;
+    const label = s.mode === 'challenge'
+      ? `⚡ Reto · pregunta ${s.finished + (s.checked ? 0 : 1)} de ${s.total}`
+      : item.attempt === 2 ? '🔁 Inténtalo de nuevo' : s.lesson.title;
+    const options = s.order.map((oi, pos) => {
+      let cls = '';
+      if (s.checked) {
+        if (oi === q.answer) cls = 'right';
+        else if (oi === s.selected) cls = 'wrong';
+      } else if (oi === s.selected) cls = 'selected';
+      return `<button class="option ${cls}" data-opt="${oi}" ${s.checked ? 'disabled' : ''}><kbd>${pos + 1}</kbd><span>${q.options[oi]}</span></button>`;
+    }).join('');
+
+    let feedback = '';
+    if (s.checked) {
+      const r = s.result;
+      if (r.ok) {
+        feedback = `<strong>¡Correcto!${r.gain ? ` +${r.gain} 🌱` : ''}</strong><p class="why">${q.why}</p>`;
+      } else {
+        const retry = s.mode === 'lesson' && item.attempt === 1 ? '<p>La volverás a ver al final de la lección.</p>' : '';
+        feedback = `<strong>${r.timedOut ? '⏱️ Se acabó el tiempo' : 'No exactamente'}</strong>
+          <p>Respuesta correcta: <b>${q.options[q.answer]}</b></p><p class="why">${q.why}</p>${retry}`;
+      }
+    }
+    const timeLeft = s.mode === 'challenge' && !s.checked ? Math.max(0, s.deadline - Date.now()) / (CHALLENGE_SECONDS * 10) : 0;
+
+    app.innerHTML = `
+      <main class="shell">
+        ${bar}
+        ${s.mode === 'challenge' ? `<div class="timer"><div id="timer-fill" style="width:${timeLeft}%"></div></div>` : ''}
+        <p class="eyebrow">${label}</p>
+        <h2 class="q">${q.q}</h2>
+        <div class="options">${options}</div>
+        <div class="checkbar ${s.checked ? (s.result.ok ? 'ok' : 'bad') : ''}">
+          <div class="feedback">${feedback}</div>
+          <button class="btn" id="action" ${!s.checked && s.selected === null ? 'disabled' : ''}>${s.checked ? 'Continuar' : 'Comprobar'}</button>
+        </div>
+      </main>`;
+    app.querySelectorAll('[data-opt]').forEach(b => b.onclick = () => select(Number(b.dataset.opt)));
+  }
+
+  if (s.confirmingQuit && s.phase === 'quiz') {
+    app.insertAdjacentHTML('beforeend', quitDialog(s));
+    document.getElementById('leave').onclick = quit;
+    document.getElementById('stay').onclick = cancelQuit;
+    document.getElementById('stay').focus();
+  }
+  const quitBtn = document.getElementById('quit');
+  if (quitBtn) quitBtn.onclick = quit;
+  document.getElementById('action').onclick = primaryAction;
+}
+
+function renderResult(s) {
+  let emoji, title, sub;
+  if (s.mode === 'lesson') {
+    emoji = s.perfect ? '🌳' : '🌿';
+    title = s.perfect ? '¡Lección perfecta!' : '¡Lección completada!';
+    sub = s.perfect ? 'Sin un solo error. Tu árbol crece 🌱' : 'Repasaste lo que fallaste — así se aprende.';
+  } else if (s.passed) {
+    emoji = '🏆'; title = '¡Reto superado!'; sub = `Dominas el nivel ${s.levelName}.`;
+  } else {
+    emoji = '💪'; title = 'Casi lo logras'; sub = `Necesitas ${CHALLENGE_PASS} de ${CHALLENGE_SIZE}. Repasa las lecciones y vuelve a intentarlo.`;
+  }
+  const accuracy = Math.round(s.firstTryCorrect / s.total * 100);
+  return `
+    <main class="shell">
+      <div class="result-card">
+        <div class="big-emoji">${emoji}</div>
+        <h2>${title}</h2>
+        <p class="sub">${sub}</p>
+        <div class="result-stats">
+          <span class="pill">🎯 ${accuracy}% al primer intento</span>
+          <span class="pill">✅ ${s.firstTryCorrect} de ${s.total}</span>
+        </div>
+        <div class="breakdown">
+          ${s.lines.map(l => `<div><span>${l[0]}</span><span>+${l[1]}</span></div>`).join('')}
+          <div class="total"><span>Total ganado</span><span>+${s.totalGain} 🌱</span></div>
+        </div>
+      </div>
+      <div class="checkbar">
+        <div class="feedback"><p>Ahora tienes <b>${state.seeds} semillas</b>.</p></div>
+        <button class="btn" id="action">Continuar</button>
+      </div>
+    </main>`;
+}
+
+/* ---------- Teclado: 1-4 para elegir, Enter para comprobar/continuar ---------- */
+document.addEventListener('keydown', e => {
+  if (!session) return;
+  if (session.confirmingQuit) {
+    if (e.key === 'Escape') cancelQuit();
+    return;
+  }
+  if (e.key === 'Enter') {
+    const btn = document.getElementById('action');
+    if (btn && !btn.disabled) { e.preventDefault(); primaryAction(); }
+  } else if (session.phase === 'quiz' && !session.checked && /^[1-9]$/.test(e.key)) {
+    const oi = session.order[Number(e.key) - 1];
+    if (oi !== undefined) select(oi);
+  } else if (e.key === 'Escape') {
+    quit();
+  }
+});
+
+/* ---------- Inicio ---------- */
+if (state.level) dailyVisit();
+render();
+</script>
+</body>
+</html>
